@@ -136,7 +136,7 @@ xmms_sc68_init (xmms_xform_t *xform)
 			return FALSE;
 		}
 	} else {
-		sc68->track = 0;
+		sc68->track = 1;
 	}
 
 	if (sc68_music_info (sc68_api, &disk_info, sc68->track, sc68->disk)) {
