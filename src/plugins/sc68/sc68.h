@@ -45,7 +45,15 @@
 # define xmms_sc68_verify_mem(a,b)     ( 0 )
 #endif /* HAVE_SC68_OLD */
 
+#ifdef HAVE_SC68_ERROR_NO_ARG
 const char *xmms_sc68_error (sc68_t *sc68);
+#else
+# define xmms_sc68_error(sc68) ({ \
+    const char *err = sc68_error(sc68); \
+    xmms_log_info ("%s", err); \
+    err; \
+  })
+#endif
 sc68_t *xmms_sc68_api_init(sc68_init_t *settings);
 int xmms_sc68_process (sc68_t *sc68, void *buffer, int *n);
 void xmms_sc68_extract_metadata (xmms_xform_t *xform,

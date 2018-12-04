@@ -25,31 +25,19 @@
  typedef void *(*sc68_alloc_t) (unsigned);
 #endif /* HAVE_SC68_OLD */
 
+#ifdef HAVE_SC68_ERROR_NO_ARG
 const char *
 xmms_sc68_error (sc68_t *sc68)
 {
-	const char *error, *log_error;
+	const char *error;
 
-#ifdef HAVE_SC68_ERROR_NO_ARG
-	error = sc68_error ();
-#else
-	error = sc68_error (sc68);
-#endif /* HAVE_SC68_ERROR_NO_ARG */
-
-	if (error) {
+	while (error = sc68_error()) {
 		xmms_log_info ("%s", error);
-	}
-
-#ifdef HAVE_SC68_ERROR_NO_ARG
-	while ((log_error = sc68_error())) {
-#else
-	while ((log_error = sc68_error(sc68))) {
-#endif /* HAVE_SC68_ERROR_NO_ARG */
-		xmms_log_info ("%s", log_error);
 	}
 
 	return error;
 }
+#endif /* HAVE_SC68_ERROR_NO_ARG */
 
 sc68_t *
 xmms_sc68_api_init(sc68_init_t *settings) {
