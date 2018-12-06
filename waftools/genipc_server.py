@@ -25,6 +25,21 @@ def get_type(typeinfo):
 		return c_type_map[typeinfo]
 	return c_type_map[typeinfo[0]](*(typeinfo[1:]))
 
+c_cast_map = {
+	'int': None,
+	'string': None,
+	'enum-value': 'int32_t',
+	'collection': None,
+	'binary': None,
+	'list': None,
+	'dictionary': None,
+	'unknown': None
+}
+def get_cast(typeinfo):
+	if not isinstance(typeinfo, basestring):
+		typeinfo = typeinfo[0]
+	return c_cast_map[typeinfo]
+
 c_getter_map = {
 	'int': 'xmmsv_get_int',
 	'string': 'xmmsv_get_string',
@@ -187,7 +202,10 @@ def emit_method_define_code(object, method, c_type):
 		if get_getter(a.type[0]) is None:
 			Indenter.printline("argval%d = t;" % i)
 		else:
-			Indenter.enter("if (!%s (t, &argval%d)) {" % (get_getter(a.type[0]), i))
+			if get_cast(a.type[0]) is None:
+				Indenter.enter("if (!%s (t, &argval%d)) {" % (get_getter(a.type[0]), i))
+			else:
+				Indenter.printline("if (!%s (t, (%s *) &argval%d)) {" %(get_getter(a.type[0]), get_cast(a.type[0]), i))
 			Indenter.printline('XMMS_DBG ("Error parsing arg %d in %s");' % (i, method.name))
 			Indenter.printline('xmms_error_set (&arg->error, XMMS_ERROR_INVAL, "Error parsing arg %d in %s");' % (i, method.name))
 			Indenter.printline("return;")
