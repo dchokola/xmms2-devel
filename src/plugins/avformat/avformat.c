@@ -1,7 +1,7 @@
 /** @file avformat.c
  *  Avformat decoder plugin
  *
- *  Copyright (C) 2006-2008 XMMS2 Team
+ *  Copyright (C) 2006-2018 XMMS2 Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,7 @@
 #include <string.h>
 #include <glib.h>
 
-#undef ABS
-#include "avformat.h"
+#include "avformat_compat.h"
 
 #define AVFORMAT_BUFFER_SIZE 4096
 
@@ -33,7 +32,7 @@ typedef struct {
 
 	AVFormatContext *fmtctx;
 	AVCodecContext *codecctx;
-	offset_t offset;
+	gint64 offset;
 
 	guchar buffer[AVFORMAT_BUFFER_SIZE];
 	guint buffer_size;
@@ -44,23 +43,26 @@ typedef struct {
 static gboolean xmms_avformat_plugin_setup (xmms_xform_plugin_t *xform_plugin);
 static gboolean xmms_avformat_init (xmms_xform_t *xform);
 static void xmms_avformat_destroy (xmms_xform_t *xform);
-static gint xmms_avformat_read (xmms_xform_t *xform, xmms_sample_t *buf, gint len,
-                                xmms_error_t *err);
+static gint xmms_avformat_read (xmms_xform_t *xform, xmms_sample_t *buf,
+                                gint len, xmms_error_t *err);
 static void xmms_avformat_get_mediainfo (xmms_xform_t *xform);
-int xmms_avformat_get_track (AVFormatContext *fmtctx);
+static int xmms_avformat_get_track (AVFormatContext *fmtctx);
 
-int xmms_avformat_read_callback (void *user_data, uint8_t *buffer,
-                                 int length);
-offset_t xmms_avformat_seek_callback (void *user_data, offset_t offset, int whence);
+static int xmms_avformat_read_callback (void *user_data,
+                                        uint8_t *buffer,
+                                        int length);
+static gint64 xmms_avformat_seek_callback (void *user_data,
+                                           gint64 offset,
+                                           int whence);
 
 /*
  * Plugin header
  */
 
-XMMS_XFORM_PLUGIN ("avformat",
-                   "AVFormat Demuxer", XMMS_VERSION,
-                   "ffmpeg libavformat demuxer",
-                   xmms_avformat_plugin_setup);
+XMMS_XFORM_PLUGIN_DEFINE ("avformat",
+                          "AVFormat Demuxer", XMMS_VERSION,
+                          "ffmpeg libavformat demuxer",
+                          xmms_avformat_plugin_setup);
 
 static gboolean
 xmms_avformat_plugin_setup (xmms_xform_plugin_t *xform_plugin)
@@ -288,7 +290,7 @@ xmms_avformat_read_callback (void *user_data, uint8_t *buffer, int length)
 }
 
 offset_t
-xmms_avformat_seek_callback (void *user_data, offset_t offset, int whence)
+xmms_avformat_seek_callback (void *user_data, gint64 offset, int whence)
 {
 	xmms_xform_t *xform;
 	xmms_avformat_data_t *data;

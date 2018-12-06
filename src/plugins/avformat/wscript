@@ -1,13 +1,39 @@
+from waflib import Errors
 from waftools.plugin import plugin
 
-def plugin_configure(conf):
-    cfg = conf.create(configurator='cfgtool')
-    cfg.binary = 'ffmpeg-config'
-    cfg.uselib = 'avformat'
-    cfg.tests = {'--cflags': 'CCFLAGS',
-                 '--plugin-libs avformat': 'LINKFLAGS'}
-    return (cfg.run() or conf.check_pkg('libavformat', destvar='avformat'))
+## Code fragments for configuration
+avformat_close_input_fragment = """
+#ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
+# include "libavformat/avformat.h"
+#else
+# include "avformat.h"
+#endif
+int main(void) {
+    AVFormatContext *fmtctx = NULL;
 
-configure, build = plugin('avformat', configure=plugin_configure,
-                          source="avformat.c",
-                          needs_lib=True)
+    avformat_close_input(&fmtctx);
+
+    return 0;
+}
+"""
+
+def plugin_configure(conf):
+	try:
+		conf.check_cfg(package="libavformat",
+		               uselib_store="avformat",
+		               args="--cflags --libs")
+	except Errors.ConfigurationError:
+		conf.check_cfg(package='ffmpeg-config',
+		               uselib_store ='avformat',
+		               args='--cflags --plugin-libs')
+	conf.check_cc(header_name="avformat.h", uselib="avformat",
+	              type="cshlib", mandatory=False)
+	conf.check_cc(header_name="libavformat/avformat.h", uselib="avformat",
+	              type="cshlib", mandatory=False)
+
+	conf.check_cc(fragment=avformat_close_input_fragment, uselib="avformat",
+	                msg="Checking for function avformat_close_input",
+	                define_name='HAVE_AVFORMAT_CLOSE_INPUT',
+	                mandatory=False)
+
+configure, build = plugin('avformat', configure=plugin_configure)
