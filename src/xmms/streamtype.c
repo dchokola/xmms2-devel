@@ -149,6 +149,8 @@ xmms_stream_type_get_str (const xmms_stream_type_t *st, xmms_stream_type_key_t k
 {
 	GList *n;
 
+	g_return_val_if_fail(st, NULL);
+
 	if (key == XMMS_STREAM_TYPE_NAME) {
 		return st->name;
 	}
@@ -171,6 +173,8 @@ gint
 xmms_stream_type_get_int (const xmms_stream_type_t *st, xmms_stream_type_key_t key)
 {
 	GList *n;
+
+	g_return_val_if_fail(st, -1);
 
 	if (key == XMMS_STREAM_TYPE_PRIORITY) {
 		return st->priority;
@@ -210,6 +214,9 @@ gboolean
 xmms_stream_type_match (const xmms_stream_type_t *in_type, const xmms_stream_type_t *out_type)
 {
 	GList *in;
+
+	g_return_val_if_fail(in_type, FALSE);
+	g_return_val_if_fail(out_type, FALSE);
 
 	for (in = in_type->list; in; in = g_list_next (in)) {
 		xmms_stream_type_val_t *inval = in->data;
