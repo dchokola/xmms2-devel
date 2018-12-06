@@ -349,6 +349,7 @@ xmms_ices_write (xmms_output_t *output, gpointer buffer,
 static void
 xmms_ices_update_comment (xmms_medialib_entry_t entry, vorbis_comment *vc)
 {
+	/* TODO: #2333
 	static const struct {
 		const gchar *prop;
 		const gchar *key;
@@ -358,6 +359,7 @@ xmms_ices_update_comment (xmms_medialib_entry_t entry, vorbis_comment *vc)
 		{XMMS_MEDIALIB_ENTRY_PROPERTY_ALBUM, "album"},
 		{NULL, NULL}
 	};
+	*/
 
 	vorbis_comment_clear (vc);
 	vorbis_comment_init (vc);
