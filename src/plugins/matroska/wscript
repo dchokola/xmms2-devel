@@ -1,0 +1,9 @@
+from waftools.plugin import plugin
+
+def plugin_configure(conf):
+	conf.check_cfg(package="libmatroska", uselib_store="matroska",
+	               args="--cflags --libs")
+
+# Have to use C++ compiler to link the stdlib. Boo!
+configure, build = plugin("matroska", tool='cxx', libs=["matroska"],
+                          configure=plugin_configure)
