@@ -29,7 +29,9 @@
 /* Who names header files like this? */
 #include <matroska/FileKax.h>
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 
 typedef struct {
 	matroska_id id;
@@ -189,4 +191,7 @@ xmms_mka_seek (xmms_xform_t *xform, gint64 samples,
 	return 0;
 }
 
+
+#ifdef __cplusplus
 }
+#endif
