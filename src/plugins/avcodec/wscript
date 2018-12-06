@@ -44,14 +44,14 @@ def plugin_configure(conf):
     # * ffmpeg: commit e4de716, lavc 53.40.0, release 0.9
     # * libav: commit 0eea212, lavc 53.25.0, release 0.8
     conf.check_cc(fragment=avcodec_decode_audio4_fragment, uselib="avcodec",
-                  uselib_store="avcodec_decode_audio4",
+                  define_name="HAVE_AVCODEC_DECODE_AUDIO4",
                   msg="Checking for function avcodec_decode_audio4", mandatory=True)
 
     # non-mandatory function avcodec_free_frame since
     # * ffmpeg: commit 46a3595, lavc 54.59.100, release 1.0
     # * libav: commit a42aada, lavc 54.28.0, release 9
     conf.check_cc(fragment=avcodec_free_frame_fragment, uselib="avcodec",
-                  uselib_store="avcodec_free_frame",
+                  define_name="HAVE_AVCODEC_FREE_FRAME",
                   msg="Checking for function avcodec_free_frame", mandatory=False)
 
 configure, build = plugin('avcodec', configure=plugin_configure,
